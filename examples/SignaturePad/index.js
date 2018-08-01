@@ -1,27 +1,29 @@
 import React, {Component} from 'react';
-import WebLoaderView from 'react-native-web-loader'
+import WebLoaderView from '../../index';
 import libSignaturePad from './signaturePad'
 
-const html = `
+const head = `
+  <style>
+    * { margin:0; padding:0;}
+
+    canvas {
+      position:absolute;transform:translateZ(0);
+      /* In case the React Transformation is not performant, we'll fall back to this one
+
+      transform-origin:left top;
+      -ms-transform-origin:left top;
+      -webkit-transform-origin:left top;
+      transform:rotate(-90deg) translate(-100%, 0px);
+      -ms-transform:rotate(-90deg)  translate(-100%, 0px);
+      -webkit-transform:rotate(-90deg)  translate(-100%, 0px);*/
+    }
+  </style>
+  <script>
+    ${libSignaturePad}
+  </script>
+`
+const body = `
   <canvas style="margin-left: 0; margin-top: 0;"></canvas>
-`;
-
-const css = `
-  * {
-    margin:0;padding:0;
-  }
-
-  canvas {
-    position:absolute;transform:translateZ(0);
-    /* In case the React Transformation is not performant, we'll fall back to this one
-
-    transform-origin:left top;
-    -ms-transform-origin:left top;
-    -webkit-transform-origin:left top;
-    transform:rotate(-90deg) translate(-100%, 0px);
-    -ms-transform:rotate(-90deg)  translate(-100%, 0px);
-    -webkit-transform:rotate(-90deg)  translate(-100%, 0px);*/
-  }
 `;
 
 function webHandler(action, callRN, window) {
@@ -81,9 +83,8 @@ export default class App extends Component {
 
     return (
       <WebLoaderView
-        html={html}
-        css={css}
-        extraScript={libSignaturePad}
+        head={head}
+        body={body}
         webHandler={webHandler}
         rnHandler={rnHandler}
         webViewProps={{

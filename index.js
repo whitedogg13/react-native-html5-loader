@@ -3,13 +3,14 @@ import {
     WebView
 } from 'react-native'
 
-const webApp = html => css => script =>`
+const webApp = head => body => app =>`
 <html>
-  <style>
-    ${css}
-  </style>
+  <head>
+    ${head}
+  </head>
+
   <body>
-    ${html}
+    ${body}
 
     <script>
       window.callRN = function(type, payload) {
@@ -33,7 +34,7 @@ const webApp = html => css => script =>`
           }
       });
 
-      ${script}
+      window.main = ${app}
     </script>
   </body>
 </html>
@@ -41,12 +42,8 @@ const webApp = html => css => script =>`
 
 class WebLoaderView extends Component {
     componentWillMount() {
-        let {html='', css='', extraScript='', webHandler} = this.props;
-        this.html = webApp(html)(css)(`
-            ${extraScript};
-            window.main = ${webHandler.toString()};
-        `);
-        console.log(this.html);
+        let {head='', body='', webHandler} = this.props;
+        this.html = webApp(head)(body)(webHandler.toString());
     }
 
     render() {
