@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import WebLoaderView from '../../index';
+import {WebView} from 'react-native';
+import Html5Loader from '../../index';
 import libSignaturePad from './signaturePad'
 
 const head = `
@@ -76,21 +77,26 @@ function webHandler(action, callRN, window) {
 export default class App extends Component {
   render() {
     function rnHandler(action, callWeb) {
+      console.log(action.type, action.payload);
       if (action.type === '__init__') {
         callWeb('render', 'hello webview!');
       }
     }
 
     return (
-      <WebLoaderView
+      <Html5Loader
         head={head}
         body={body}
         webHandler={webHandler}
         rnHandler={rnHandler}
-        webViewProps={{
-          style: {flex: 1, alignSelf: 'stretch'}
-        }}
-      />
+      >
+        {({callWeb, webViewProps}) => (
+          <WebView
+            {...webViewProps}
+            style={{flex: 1, alignSelf: 'stretch'}}
+          />
+        )}
+      </Html5Loader>
     );
   }
 }

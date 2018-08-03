@@ -1,7 +1,4 @@
 import React, {Component} from 'react'
-import {
-    WebView
-} from 'react-native'
 
 const webApp = head => body => app =>`
 <html>
@@ -10,17 +7,17 @@ const webApp = head => body => app =>`
   </head>
 
   <body>
-    ${body}
-
     <script>
       window.callRN = function(type, payload) {
           window.postMessage(JSON.stringify({type: type, payload: payload}));
       };
 
-      window.onerror = function(message, url, line, column, error) {
-        callRN('__err__', {message: message, url: url, line: line, column: column});
-      };
-    
+      window.addEventListener('error', function(message, source, line, col, error) {
+        callRN('__err__', {
+            message: message, source: source, line: line, col: col, error: error,
+        });
+      });
+
       document.addEventListener('message', function(event) {
           try {
               var action = JSON.parse(event.data);
@@ -33,34 +30,52 @@ const webApp = head => body => app =>`
               callRN('__ex__', ex);
           }
       });
+    </script>
 
+    ${body}
+
+    <script>
       window.main = ${app}
     </script>
   </body>
 </html>
 `;
 
-class WebLoaderView extends Component {
+function _validateProps(props) {
+    let { rnHandler, webHandler } = props;
+    if (!rnHandler || typeof (rnHandler) !== 'function') {
+        throw new Error('prop rnHandler should be a function');
+    }
+
+    if (!webHandler || typeof (webHandler) !== 'function') {
+        throw new Error('prop webHandler should be a function');
+    }
+}
+
+class Html5Loader extends Component {
     componentWillMount() {
+        _validateProps(this.props);
+
         let {head='', body='', webHandler} = this.props;
         this.html = webApp(head)(body)(webHandler.toString());
+        console.log(this.html);
     }
 
     render() {
-        let {webViewProps={}} = this.props;
-        return (
-            <WebView 
-                {...webViewProps}
-                ref={this._onRef}
-                onMessage={this._onMessage}
-                originWhitelist={['*']} 
-                source={{
-                    html: this.html, baseUrl: ''
-                }}
-            >
-                {this.props.children}
-            </WebView>
-        )
+        let webViewProps = {
+            ref: this._onRef,
+            onMessage: this._onMessage,
+            originWhitelist: ['*'],
+            source: {
+                html: this.html, 
+                baseUrl: ''
+            }
+        }
+
+        return this.props.children({
+            callWeb: this._callWeb,
+            webViewProps,
+        })
     }
 
     _onRef = ref => {
@@ -75,7 +90,6 @@ class WebLoaderView extends Component {
 
         try {
             let action = JSON.parse(event.nativeEvent.data);
-            console.log(action);
 
             if (action.type === '__init__') {
                 clearInterval(this.timer);
@@ -95,4 +109,4 @@ class WebLoaderView extends Component {
     }
 }
 
-export default WebLoaderView;
+export default Html5Loader;

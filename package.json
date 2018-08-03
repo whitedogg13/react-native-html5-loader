@@ -1,12 +1,26 @@
 {
   "name": "react-native-html5-loader",
   "version": "0.0.1",
-  "description": "",
+  "description": "Mini library to help you easily integrate existing web library into React Native",                                                                                                                                                                                                            
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/whitedogg13/react-native-html5-loader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/whitedogg13/react-native-html5-loader/issues"
+  },  
+  "keywords": [
+    "react-native",
+    "android",
+    "ios"
+  ], 
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "author": {
+    "name": "Richie",
+    "url": "https://github.com/whitedogg13"
+  },
   "license": "MIT"
 }
